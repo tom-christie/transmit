@@ -1,0 +1,14 @@
+Package: transmit
+Type: Package
+Title: Transmitting information using Poisson processes and Bayesian inference
+Version: 1.0
+Date: 2019-05-30
+Author: Thomas Christie
+Maintainer: Thomas Christie <my@email.com>
+Description: This does some stuff.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.1), poisson, dplyr, assertthat, data.table
+LinkingTo: Rcpp
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat (>= 2.1.0)
