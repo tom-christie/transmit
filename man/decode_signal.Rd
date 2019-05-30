@@ -5,8 +5,9 @@
 \title{Determine which symbol is being transmitted.}
 \usage{
 decode_signal(codebook, signal_plus_noise, signal_power, noise_power,
-  prior = c(), time_interval = 0.1, entropy_threshold = 0.1,
-  return_entropy_trace = FALSE, return_posteriors = FALSE)
+  prior_distribution = c(), time_interval = 0.1,
+  entropy_threshold = 0.1, return_entropy_trace = FALSE,
+  return_posteriors = FALSE)
 }
 \arguments{
 \item{codebook}{constructed using construct_codebook function}
@@ -17,15 +18,13 @@ decode_signal(codebook, signal_plus_noise, signal_power, noise_power,
 
 \item{noise_power}{spikes per second allocated to every process (including signal process)}
 
+\item{prior_distribution}{initial guess at the distribution of messages. Influences decoding times.}
+
 \item{entropy_threshold}{transmission stops after entropy reaches this threshold}
 
 \item{return_entropy_trace}{return posterior entropy for each time step}
 
 \item{return_posteriors}{return posterior distribution for each time step}
-
-\item{prior_distribution}{initial guess at the distribution of messages. Influences decoding times.}
-
-\item{entropy_threshold}{transmission stops after entropy reaches this threshold}
 }
 \value{
 list of data frames. Will list decoded symbol, stop_time (in units of interval), entropy threshold, posterior at stop time, and potentially other time series as specified in the function call

@@ -5,8 +5,8 @@
 \title{Encode the signal, add noise, and decode the signal}
 \usage{
 transmit_signal(codebook, symbol, signal_power, noise_power, timesteps,
-  prior, time_interval = 0.1, threshold = "entropy",
-  threshold_value = 0.1, return_posteriors = FALSE,
+  prior_distribution = c(), time_interval = 0.1,
+  entropy_threshold = 0.1, return_posteriors = FALSE,
   leak_symbols = NA, leak_powers = NA)
 }
 \arguments{
@@ -20,13 +20,13 @@ transmit_signal(codebook, symbol, signal_power, noise_power, timesteps,
 
 \item{timesteps}{number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'}
 
-\item{time_interval}{time resolution for simulations (like dt)}
-
 \item{prior_distribution}{initial guess at the distribution of messages. Influences decoding times.}
 
 \item{entropy_threshold}{transmission stops after entropy reaches this threshold}
 
-\item{repeats}{number of times to run the simulation}
+\item{leak_symbols}{array of symbols 'accidentally' allocated signal power}
+
+\item{leak_powers}{array of signal powers to allocated to leak_symbols}
 }
 \value{
 returns which symbol is decided plus response time and which symbol was sent

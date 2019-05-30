@@ -2,7 +2,6 @@
 #'
 #' The 'code' is just a Poisson spike train for a given group of neurons
 #' This function will return a data frame with (group_index,spike_time) columns
-
 #'
 #' Some other stuff here.  
 #'
@@ -22,8 +21,6 @@
 #' 
 #' @export
 
-require(poisson)
-
 encode_signal <- function(codebook,
                           symbol,
                           signal_power,
@@ -31,7 +28,8 @@ encode_signal <- function(codebook,
                           leak_symbols = NA,
                           leak_powers = NA) {
     
-
+    require(poisson)
+    
     #generate more spikes than necessary, then cull down
     spikes <- hpp.event.times(rate = signal_power, num.events = timesteps*signal_power*2, num.sims = 1, t0 = 0)
     spikes <- spikes[which(spikes < timesteps)]

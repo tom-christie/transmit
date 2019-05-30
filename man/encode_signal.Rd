@@ -4,13 +4,13 @@
 \alias{encode_signal}
 \title{Encode signal into Poisson spikes}
 \usage{
-encode_signal(codebook, current_symbol, signal_power, timesteps,
+encode_signal(codebook, symbol, signal_power, timesteps,
   leak_symbols = NA, leak_powers = NA)
 }
 \arguments{
 \item{codebook}{constructed using construct_codebook function}
 
-\item{current_symbol}{symbol to be encoded}
+\item{symbol}{symbol to be encoded}
 
 \item{signal_power}{spikes per second allocated to signal process}
 
@@ -24,7 +24,8 @@ encode_signal(codebook, current_symbol, signal_power, timesteps,
 
 }
 \description{
-Converts a symbol to a list of spike times
+The 'code' is just a Poisson spike train for a given group of neurons
+This function will return a data frame with (group_index,spike_time) columns
 }
 \details{
 Some other stuff here.

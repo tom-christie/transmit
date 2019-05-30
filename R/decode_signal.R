@@ -22,8 +22,6 @@
 #' @export
 
 
-require(data.table)
-
 decode_signal <- function(
     codebook,
     signal_plus_noise,
@@ -35,11 +33,8 @@ decode_signal <- function(
     return_entropy_trace = FALSE,
     return_posteriors = FALSE
 ){
-    #symbols <- c('A','B','C','D')
-    #codebook <- construct_codebook(symbols)
-    #signal_power = 3
-    #noise_power = 10
-    #prior_distribution = c(0.333, 0.333, 0.333)
+    
+    require(data.table)
     
     #codebook - codebook from the 'construct_codebook' function
     #signal_plus_noise - data_frame with (group_index,spike_time) columns

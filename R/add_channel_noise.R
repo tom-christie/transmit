@@ -13,7 +13,6 @@
 #' 
 #' @export
 
-require(poisson)
 
 add_channel_noise <- function(
     codebook, 
@@ -26,6 +25,7 @@ add_channel_noise <- function(
     #noise_power - Poisson rate applied to each single neuron
     #timesteps - how long to simulate for
     #output is a data_frame with (group_index,spike_times) columns
+    require(poisson)
     
     assert_that(timesteps > max(signal$spike_time))
     signal$type='signal'
