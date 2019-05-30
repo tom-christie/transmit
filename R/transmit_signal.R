@@ -59,6 +59,9 @@ transmit_signal <- function(
         entropy_threshold = entropy_threshold,
         return_posteriors = return_posteriors
     )
+    
     z$sent_symbol <- symbol
+    
     return(z)
-}
+
+    }

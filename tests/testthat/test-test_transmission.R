@@ -1,6 +1,6 @@
 test_that("example transmission", {
     codebook <- construct_codebook(c('A', 'B', 'C'), c(1, 1, 1))
-    result <- transmit_signal(
+    decoded_signal <- transmit_signal(
         codebook=codebook,
         symbol = 'A',
         signal_power = 3,
@@ -10,5 +10,11 @@ test_that("example transmission", {
         entropy_threshold = 0.1
         #repeats=1:1000
     )
-    
+    expect_true('decoded_symbol' %in% names(decoded_signal))
+    expect_true('stop_time' %in% names(decoded_signal))
+    expect_true('entropy_threshold' %in% names(decoded_signal))
+    expect_true('posterior_at_stop_time' %in% names(decoded_signal))
+    expect_false('entropy_trace' %in% names(decoded_signal))
+    expect_false('posterior_trace' %in% names(decoded_signal))
+    expect_equal(length(decoded_signal[['posterior_at_stop_time']]), 3)
 })

@@ -34,7 +34,7 @@ prior_experiment <- function(
     time_interval,
     repeats
 ){
-    
+    require(data.table)
     # Go through the codebook and send messages at the actual_proportion
     symbols <- rep(NA,length(codebook))
     for(i in codebook){

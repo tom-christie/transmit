@@ -26,6 +26,7 @@ add_channel_noise <- function(
     #timesteps - how long to simulate for
     #output is a data_frame with (group_index,spike_times) columns
     require(poisson)
+    require(data.table)
     
     assert_that(timesteps > max(signal$spike_time))
     signal$type='signal'
