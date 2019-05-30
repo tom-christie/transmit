@@ -7,7 +7,11 @@ Author: Thomas Christie
 Maintainer: Thomas Christie <my@email.com>
 Description: This does some stuff.
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.1), poisson, dplyr, assertthat, data.table
+Imports: Rcpp (>= 1.0.1), 
+    poisson, 
+    dplyr, 
+    assertthat, 
+    data.table
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1
 Suggests: 

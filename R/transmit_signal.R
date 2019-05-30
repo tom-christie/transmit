@@ -21,23 +21,23 @@
 #' 
 #' @export
 
+
 transmit_signal <- function(
     codebook,
     symbol,
     signal_power,
     noise_power,
     timesteps,
-    prior,
+    prior_distribution = c(),
     time_interval = 0.1,
-    threshold = 'entropy',
-    threshold_value = 0.1,
+    entropy_threshold = 0.1,
     return_posteriors = FALSE,
     leak_symbols = NA,
     leak_powers = NA
 ){
     signal <- encode_signal(
         codebook = codebook,
-        current_symbol = symbol,
+        symbol = symbol,
         signal_power = signal_power,
         timesteps = timesteps,
         leak_symbols = leak_symbols,
@@ -54,10 +54,9 @@ transmit_signal <- function(
         signal_plus_noise = signal_plus_noise,
         signal_power = signal_power,
         noise_power = noise_power,
-        prior = prior,
+        prior_distribution = prior_distribution,
         time_interval = time_interval,
-        threshold = threshold,
-        threshold_value = threshold_value,
+        entropy_threshold = entropy_threshold,
         return_posteriors = return_posteriors
     )
     z$sent_symbol <- symbol

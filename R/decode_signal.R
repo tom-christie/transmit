@@ -9,7 +9,6 @@
 #' @param noise_power spikes per second allocated to every process (including signal process)
 #' @param prior_distribution initial guess at the distribution of messages. Influences decoding times.
 #' @param entropy_threshold transmission stops after entropy reaches this threshold
-#' @param entropy_threshold transmission stops after entropy reaches this threshold
 #' @param return_entropy_trace return posterior entropy for each time step
 #' @param return_posteriors return posterior distribution for each time step
 
@@ -23,14 +22,14 @@
 #' @export
 
 
-
+require(data.table)
 
 decode_signal <- function(
     codebook,
     signal_plus_noise,
     signal_power,
     noise_power,
-    prior = c(),
+    prior_distribution = c(),
     time_interval = 0.1,
     entropy_threshold = 0.1,
     return_entropy_trace = FALSE,
@@ -78,15 +77,15 @@ decode_signal <- function(
         # since we want signal power to represent total extra energy into the system
     }
     
-    ## Construct threshold in terms of time or entropy
-    if(threshold == 'error_rate'){
-        n <- length(group_indexes)
-        entropy_threshold <- (n-1)*((1-threshold_value)/(n-1))*log2((1-threshold_value)/(n-1)) + threshold_value*log2(threshold_value)
-        entropy_threshold <- -1*entropy_threshold
-        threshold <- 'entropy'
-    }else if(threshold == 'entropy'){
-        entropy_threshold = threshold_value
-    }
+    # ## Construct threshold in terms of time or entropy
+    # if(threshold == 'error_rate'){
+    #     n <- length(group_indexes)
+    #     entropy_threshold <- (n-1)*((1-threshold_value)/(n-1))*log2((1-threshold_value)/(n-1)) + threshold_value*log2(threshold_value)
+    #     entropy_threshold <- -1*entropy_threshold
+    #     threshold <- 'entropy'
+    # }else if(threshold == 'entropy'){
+    #     entropy_threshold = threshold_value
+    # }
     
     
     # Want to calculate the posterior probability that the configuration represents a 'signal' for each group
@@ -169,24 +168,24 @@ decode_signal <- function(
         if(length(neuron_choice) >= 1){
             neuron_choice <- neuron_choice[1]
             
-            response <- data.frame(
+            response <- list(
                 decoded_symbol=symbols[neuron_choice],
                 stop_time=stop_time,
                 entropy_threshold = entropy_threshold,
-                posterior_at_stop_time = I(list(posterior[stop_time, ]))
+                posterior_at_stop_time = posterior[stop_time, ]
             )
             
         }else if(length(neuron_choice) == 0){ #why would this ever happen?
             neuron_choice <- -1
-            response <- data.frame(
+            response <- list(
                 decoded_symbol="UNKNOWN",
                 stop_time=NA,
                 entropy_threshold = entropy_threshold,
                 posterior_at_stop_time = NA
             )
-        }   #print(posterior[stop_time,])
+        }
     }else{
-        response <- data.frame(
+        response <- list(
             decoded_symbol=NA,
             stop_time=NA,
             entropy_threshold = entropy_threshold,
@@ -196,19 +195,16 @@ decode_signal <- function(
     
     if(return_entropy_trace){
         if(return_posteriors){
-            return(list(response=response,
-                        entropy_trace=entropy,
-                        posterior=posterior))
+            response$entropy_trace = entropy
+            response$posterior_trace = posterior
+
         }else{
-            return(list(response=response,
-                        entropy_trace=entropy))
+            response$entropy_trace = entropy
         }
     }else{
         if(return_posteriors){
-            return(list(response=response,
-                        posterior=posterior))
-        }else{
-            return(list(response=response))
+            response$posterior_trace = posterior
         }
     }
+    return(response)
 }

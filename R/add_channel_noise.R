@@ -13,7 +13,7 @@
 #' 
 #' @export
 
-
+require(poisson)
 
 add_channel_noise <- function(
     codebook, 
