@@ -1,6 +1,6 @@
 # transmit 
 
-The aim of this package is to enable simulations of information transmission using Poisson processes and Bayesian inference as described [in this paper](https://github.com/tom-christie/transmit/blob/master/vignettes/Christie\ and\ Schrater 2019.pdf).
+The aim of this package is to enable simulations of information transmission using Poisson processes and Bayesian inference as described [in this paper](https://github.com/tom-christie/transmit/blob/master/vignettes/Christie_and_Schrater_2019.pdf).
 
 ## Installation
 
