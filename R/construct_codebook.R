@@ -7,6 +7,7 @@
 #' 
 #' @return 
 #' 
+#' @import assertthat
 #' 
 #' @example
 #' 
@@ -31,7 +32,7 @@ construct_codebook <- function(symbols,
     ## The allocation essentially specifies noise in each of the dimensions
     ## This is similar to the 'sphere-packing' argument for Gaussian but everything is positive
     
-    require(assertthat)
+    #require(assertthat)
     
     if (length(neuron_allocation) < 1) {
         neuron_allocation <- rep.int(1, length(symbols))

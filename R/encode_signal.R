@@ -14,6 +14,7 @@
 #' 
 #' @return 
 #' 
+#' @importFrom poisson hpp.event.times
 #' 
 #' @example
 #' 
@@ -28,7 +29,7 @@ encode_signal <- function(codebook,
                           leak_symbols = NA,
                           leak_powers = NA) {
     
-    require(poisson)
+    #require(poisson)
     
     #generate more spikes than necessary, then cull down
     spikes <- hpp.event.times(rate = signal_power, num.events = timesteps*signal_power*2, num.sims = 1, t0 = 0)

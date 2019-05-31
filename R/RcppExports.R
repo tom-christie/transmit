@@ -2,10 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 count_spikes <- function(group_index, num_groups, spike_time, timesteps) {
-    .Call(`_transmit_count_spikes`, group_index, num_groups, spike_time, timesteps)
-}
-
-rcpp_hello_world <- function() {
-    .Call(`_transmit_rcpp_hello_world`)
+    .Call('_transmit_count_spikes', PACKAGE = 'transmit', group_index, num_groups, spike_time, timesteps)
 }
 

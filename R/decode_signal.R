@@ -14,10 +14,12 @@
 
 #' @return list of data frames. Will list decoded symbol, stop_time (in units of interval), entropy threshold, posterior at stop time, and potentially other time series as specified in the function call
 #' 
+#' @import Rcpp
+#' @importFrom data.table rbindlist
+#' @useDynLib transmit
+#' 
 #' 
 #' @example
-#' 
-#' 
 #' 
 #' @export
 
@@ -34,7 +36,7 @@ decode_signal <- function(
     return_posteriors = FALSE
 ){
     
-    require(data.table)
+    #require(data.table)
     
     #codebook - codebook from the 'construct_codebook' function
     #signal_plus_noise - data_frame with (group_index,spike_time) columns
@@ -108,6 +110,7 @@ decode_signal <- function(
     #                sum(signal_plus_noise[signal_plus_noise$group_index == index,]$spike_time <= x)
     #         })
     #        })
+    
     counts_per_neuron <- counts / 
         matrix(rep(group_sizes, length(timesteps)), ncol=length(group_indexes), byrow=TRUE)
     

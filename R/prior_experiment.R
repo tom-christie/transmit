@@ -14,6 +14,7 @@
 #' 
 #' @return data frame containing encoded and decoded symbols 
 #' 
+#' @importFrom data.table rbindlist
 #' 
 #' @example
 #' 
@@ -34,7 +35,7 @@ prior_experiment <- function(
     time_interval,
     repeats
 ){
-    require(data.table)
+    #require(data.table)
     # Go through the codebook and send messages at the actual_proportion
     symbols <- rep(NA,length(codebook))
     for(i in codebook){

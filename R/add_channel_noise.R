@@ -7,6 +7,10 @@
 #' @param noise_power spikes per second to add to every Poisson process, i.e. for each symbol in the codebook
 #' @param timesteps length of time to simulate. needed to know how much noise to produce.
 #' 
+#' @importFrom poisson hpp.event.times
+#' @importFrom data.table rbindlist
+#' @importFrom assertthat assert_that
+#' 
 #' @return data frame with noise appended
 #' 
 #' @example
@@ -25,8 +29,6 @@ add_channel_noise <- function(
     #noise_power - Poisson rate applied to each single neuron
     #timesteps - how long to simulate for
     #output is a data_frame with (group_index,spike_times) columns
-    require(poisson)
-    require(data.table)
     
     assert_that(timesteps > max(signal$spike_time))
     signal$type='signal'
