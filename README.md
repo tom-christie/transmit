@@ -1,6 +1,6 @@
 # transmit 
 
-The aim of this package is to enable simulations of information transmission using Poisson processes and Bayesian inference as described [in this paper](url_goes_here).
+The aim of this package is to enable simulations of information transmission using Poisson processes and Bayesian inference as described [in this paper](https://github.com/tom-christie/transmit/blob/master/vignettes/Christie and Schrater 2019.pdf).
 
 ## Installation
 
@@ -12,7 +12,7 @@ devtools::install_github("tom-christie/transmit")
 
 ## Example
 
-<img src="url_to_image_goes_here" height="252"/>
+<img src="https://github.com/tom-christie/transmit/blob/master/inst/entropy_decrease_example.png?raw=true" height="252"/>
 
 ## Usage
 
