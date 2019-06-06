@@ -7,10 +7,12 @@
 #' @param signal_plus_noise signal to be decoded, output by add_channel_noise
 #' @param signal_power spikes per second allocated to signal process
 #' @param noise_power spikes per second allocated to every process (including signal process)
+#' @param time_interval the interval at which to perform inference
 #' @param prior_distribution initial guess at the distribution of messages. Influences decoding times.
 #' @param entropy_threshold transmission stops after entropy reaches this threshold
 #' @param return_entropy_trace return posterior entropy for each time step
-#' @param return_posteriors return posterior distribution for each time step
+#' @param return_posterior_at_stop_time returns posterior values at stop time
+#' @param return_posterior_trace return trace of posterior values for every time step
 
 #' @return list of data frames. Will list decoded symbol, stop_time (in units of interval), entropy threshold, posterior at stop time, and potentially other time series as specified in the function call
 #' 
@@ -33,20 +35,11 @@ decode_signal <- function(
     time_interval = 0.1,
     entropy_threshold = 0.1,
     return_entropy_trace = FALSE,
-    return_posteriors = FALSE
+    return_posterior_trace = FALSE,
+    return_posterior_at_stop_time = FALSE
 ){
-    
     #require(data.table)
-    
-    #codebook - codebook from the 'construct_codebook' function
-    #signal_plus_noise - data_frame with (group_index,spike_time) columns
-    #signal_power, noise_power - for computing posteriors, 
-    #    i.e. the decoder knows the characteristics of the channel
-    #prior_distribution - prior probabilities of each symbol, defaults to uniform
-    #time_interval - rather than calculating the posterior prob at each spike
-    #    we can calculate it at each time_interval
-    #    this should cut down (?) on the computational capacity
-    
+
     #this function tries to decide which neuron group is firing fastest, 
     #i.e. in which group each neuron has the 'signal' firing rate
     #the function is 'omnicient' in that it knows the codebook and the signal and noise powers
@@ -165,12 +158,17 @@ decode_signal <- function(
         neuron_choice <- which(posterior[stop_time, ] == max(posterior[stop_time,]))
         if(length(neuron_choice) >= 1){
             neuron_choice <- neuron_choice[1]
-            
+            if(return_posterior_at_stop_time){
+                posterior_at_stop_time = I(list(posterior[stop_time, ]))
+            }else{
+                posterior_at_stop_time = NA
+            }
             response <- list(
                 decoded_symbol=symbols[neuron_choice],
                 stop_time=stop_time,
+                stop_time_in_seconds = stop_time*time_interval,
                 entropy_threshold = entropy_threshold,
-                posterior_at_stop_time = posterior[stop_time, ]
+                posterior_at_stop_time = posterior_at_stop_time
             )
             
         }else if(length(neuron_choice) == 0){ #why would this ever happen?
@@ -178,6 +176,7 @@ decode_signal <- function(
             response <- list(
                 decoded_symbol="UNKNOWN",
                 stop_time=NA,
+                stop_time_in_seconds = NA,
                 entropy_threshold = entropy_threshold,
                 posterior_at_stop_time = NA
             )
@@ -186,13 +185,14 @@ decode_signal <- function(
         response <- list(
             decoded_symbol=NA,
             stop_time=NA,
+            stop_time_in_seconds = NA,
             entropy_threshold = entropy_threshold,
             posterior_at_stop_time = NA
         )
     }
     
     if(return_entropy_trace){
-        if(return_posteriors){
+        if(return_posterior_trace){
             response$entropy_trace = entropy
             response$posterior_trace = posterior
 
@@ -200,7 +200,7 @@ decode_signal <- function(
             response$entropy_trace = entropy
         }
     }else{
-        if(return_posteriors){
+        if(return_posterior_trace){
             response$posterior_trace = posterior
         }
     }

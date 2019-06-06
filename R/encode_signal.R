@@ -37,7 +37,8 @@ encode_signal <- function(codebook,
     
     #get symbol position
     z <- sapply(codebook, function(x){if(x$symbol == symbol){x$index}else{NA}})
-    spikes_df <- data.frame(group_index=unname(z)[!is.na(z)], spike_time = spikes)
+    spikes_df <- data.frame(group_index=unname(z)[!is.na(z)], 
+                            spike_time = spikes)
     
     #add leak spikes if appropriate
     if( (length(leak_symbols) > 1) || !is.na(leak_symbols)){

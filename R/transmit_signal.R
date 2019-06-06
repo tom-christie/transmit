@@ -7,8 +7,11 @@
 #' @param signal_power spikes per second allocated to signal process
 #' @param noise_power spikes per second allocated to every process (including signal process)
 #' @param timesteps number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'
+#' @param time_interval the interval at which to perform inference
 #' @param prior_distribution initial guess at the distribution of messages. Influences decoding times.
 #' @param entropy_threshold transmission stops after entropy reaches this threshold
+#' @param return_posterior_at_stop_time returns posterior values at stop time
+#' @param return_posterior_trace return trace of posterior values for every time step
 #' @param leak_symbols array of symbols 'accidentally' allocated signal power
 #' @param leak_powers array of signal powers to allocated to leak_symbols
 #' 
@@ -31,7 +34,8 @@ transmit_signal <- function(
     prior_distribution = c(),
     time_interval = 0.1,
     entropy_threshold = 0.1,
-    return_posteriors = FALSE,
+    return_posterior_at_stop_time = FALSE,
+    return_posterior_trace = FALSE,
     leak_symbols = NA,
     leak_powers = NA
 ){
@@ -57,11 +61,12 @@ transmit_signal <- function(
         prior_distribution = prior_distribution,
         time_interval = time_interval,
         entropy_threshold = entropy_threshold,
-        return_posteriors = return_posteriors
+        return_posterior_at_stop_time = return_posterior_at_stop_time,
+        return_posterior_trace = return_posterior_trace
     )
     
     z$sent_symbol <- symbol
     
     return(z)
 
-    }
+}

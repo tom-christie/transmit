@@ -23,7 +23,7 @@ test_that("decoding a signal", {
         time_interval = 0.1,
         entropy_threshold = 0.1,
         return_entropy_trace = FALSE,
-        return_posteriors = FALSE
+        return_posterior_trace = FALSE
     )
     
     
@@ -33,7 +33,20 @@ test_that("decoding a signal", {
     expect_true('posterior_at_stop_time' %in% names(decoded_signal))
     expect_false('entropy_trace' %in% names(decoded_signal))
     expect_false('posterior_trace' %in% names(decoded_signal))
-    expect_equal(length(decoded_signal[['posterior_at_stop_time']]), 3)
+    expect_equal(length(decoded_signal[['posterior_at_stop_time']]), 1)
+    
+    decoded_signal <- decode_signal(
+        codebook,
+        signal_plus_noise = signal_plus_noise,
+        signal_power = 3,
+        noise_power = 10,
+        time_interval = 0.1,
+        entropy_threshold = 0.1,
+        return_entropy_trace = FALSE,
+        return_posterior_trace = FALSE,
+        return_posterior_at_stop_time = TRUE
+    )
+    expect_equal(length(decoded_signal[['posterior_at_stop_time']][[1]]), 3)
 })
 
 
@@ -62,7 +75,7 @@ test_that("decoded symbol has an entropy trace", {
         time_interval = 0.1,
         entropy_threshold = 0.1,
         return_entropy_trace = TRUE,
-        return_posteriors = FALSE
+        return_posterior_trace = FALSE
     )
     
     
@@ -101,7 +114,7 @@ test_that("decoded symbol has a posterior trace", {
         time_interval = 0.1,
         entropy_threshold = 0.1,
         return_entropy_trace = FALSE,
-        return_posteriors = TRUE
+        return_posterior_trace = TRUE
     )
     
     expect_true('decoded_symbol' %in% names(decoded_signal))
