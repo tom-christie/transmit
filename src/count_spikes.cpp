@@ -51,7 +51,4 @@ IntegerMatrix count_spikes(IntegerVector group_index,
 // (useful for testing and development). The R code will be automatically 
 // run after the compilation.
 //
-
-// R
-// timesTwo(42)
 // 
