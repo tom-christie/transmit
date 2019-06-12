@@ -1,11 +1,11 @@
 test_that("example transmission", {
-    codebook <- construct_codebook(c('A', 'B', 'C'), c(1, 1, 1))
+    codebook <- construct_codebook(c('A', 'B', 'C'))
     decoded_signal <- transmit_signal(
         codebook=codebook,
         symbol = 'A',
-        signal_power = 3,
+        signal_power = 10,
         noise_power = 10,
-        timesteps = 10,
+        duration_in_seconds = 10,
         time_interval = 0.1,
         entropy_threshold = 0.1,
         return_posterior_at_stop_time = TRUE

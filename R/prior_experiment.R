@@ -8,13 +8,14 @@
 #' @param entropy_threshold transmission stops after entropy reaches this threshold
 #' @param signal_power spikes per second allocated to signal process
 #' @param noise_power spikes per second allocated to every process (including signal process)
-#' @param timesteps number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'
+#' @param duration_in_seconds number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'
 #' @param time_interval time resolution for simulations (like dt)
 #' @param repeats number of times to run the simulation
 #' 
 #' @return data frame containing encoded and decoded symbols 
 #' 
 #' @importFrom data.table rbindlist
+#' @importFrom parallel mcmapply detectCores
 #' 
 #' @example
 #' 
@@ -25,40 +26,33 @@
 
 prior_experiment <- function(
     codebook,
-    source_distribution,
+    source_distribution, 
     prior_distribution,
     threshold_type,
     threshold_value,
     signal_power,
     noise_power,
-    timesteps,
+    duration_in_seconds,
     time_interval,
     repeats
 ){
-    #require(data.table)
-    # Go through the codebook and send messages at the actual_proportion
-    symbols <- rep(NA,length(codebook))
-    for(i in codebook){
-        symbols[i$index] <- i$symbol
-    }
+    # Generate symbols to send according to the source_distribution
+    symbols <- unname(unlist(lapply(codebook,function(x) x$symbol)))
     z <- rmultinom(1, repeats, source_distribution)[,]
     symbol_sequence <- unlist(sapply(1:length(z), function(i){rep(symbols[i], times=z[i])}))
     symbol_sequence <- sample(symbol_sequence, length(symbol_sequence), replace=FALSE) #randomize order, not that it really matters
-    profiling = FALSE
     
     results.temp <- mcmapply(transmit_signal,
                              symbol = symbol_sequence,
                              signal_power = signal_power,
                              noise_power = noise_power,
-                             timesteps = timesteps,
+                             duration_in_seconds = duration_in_seconds,
                              time_interval = time_interval,
-                             threshold = 'entropy',
-                             threshold_value = entropy_threshold,
+                             entropy_threshold = entropy_threshold,
                              MoreArgs = list(codebook=codebook,
-                                             prior=prior_distribution),
-                             mc.cores=8,
+                                             prior_distribution=prior_distribution),
+                             mc.cores=detectCores()-2,
                              SIMPLIFY=FALSE)
     results <- rbindlist(results.temp)
-    results.temp[[4]]
     return(results)
 }

@@ -5,8 +5,8 @@
 \title{Run a bunch of simulations with a given}
 \usage{
 prior_experiment(codebook, source_distribution, prior_distribution,
-  threshold_type, threshold_value, signal_power, noise_power, timesteps,
-  time_interval, repeats)
+  threshold_type, threshold_value, signal_power, noise_power,
+  duration_in_seconds, time_interval, repeats)
 }
 \arguments{
 \item{codebook}{constructed using construct_codebook function}
@@ -19,7 +19,7 @@ prior_experiment(codebook, source_distribution, prior_distribution,
 
 \item{noise_power}{spikes per second allocated to every process (including signal process)}
 
-\item{timesteps}{number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'}
+\item{duration_in_seconds}{number of time (in seconds) to simulate for -- limits max decoding time. Signals not decoded by this time will be interpreted as 'NA'}
 
 \item{time_interval}{time resolution for simulations (like dt)}
 

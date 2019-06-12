@@ -1,24 +1,25 @@
 test_that("decoding a signal", {
-    codebook <- construct_codebook(c('A', 'B', 'C'), c(1, 1, 1))
+    
+    codebook <- construct_codebook(c('A', 'B', 'C'))
     
     signal <- encode_signal(
         codebook=codebook,
         symbol = 'A',
-        signal_power = 3,
-        timesteps = 10
+        signal_power = 10,
+        duration_in_seconds = 10
     )
 
     signal_plus_noise <- add_channel_noise(
         codebook = codebook,
         signal = signal,
         noise_power = 10,
-        timesteps=10
+        duration_in_seconds=10
     )
     
     decoded_signal <- decode_signal(
         codebook,
         signal_plus_noise = signal_plus_noise,
-        signal_power = 3,
+        signal_power = 10,
         noise_power = 10,
         time_interval = 0.1,
         entropy_threshold = 0.1,
@@ -38,7 +39,7 @@ test_that("decoding a signal", {
     decoded_signal <- decode_signal(
         codebook,
         signal_plus_noise = signal_plus_noise,
-        signal_power = 3,
+        signal_power = 10,
         noise_power = 10,
         time_interval = 0.1,
         entropy_threshold = 0.1,
@@ -46,31 +47,33 @@ test_that("decoding a signal", {
         return_posterior_trace = FALSE,
         return_posterior_at_stop_time = TRUE
     )
+    #print(decoded_signal[['posterior_at_stop_time']])
+    #print(length(decoded_signal[['posterior_at_stop_time']][[1]]))
     expect_equal(length(decoded_signal[['posterior_at_stop_time']][[1]]), 3)
 })
 
 
 test_that("decoded symbol has an entropy trace", {
-    codebook <- construct_codebook(c('A', 'B', 'C'), c(1, 1, 1))
+    codebook <- construct_codebook(c('A', 'B', 'C'))
     
     signal <- encode_signal(
         codebook=codebook,
         symbol = 'A',
-        signal_power = 3,
-        timesteps = 10
+        signal_power = 10,
+        duration_in_seconds = 10
     )
     
     signal_plus_noise <- add_channel_noise(
         codebook = codebook,
         signal = signal,
         noise_power = 10,
-        timesteps=10
+        duration_in_seconds=10
     )
     
     decoded_signal <- decode_signal(
         codebook,
         signal_plus_noise = signal_plus_noise,
-        signal_power = 3,
+        signal_power = 10,
         noise_power = 10,
         time_interval = 0.1,
         entropy_threshold = 0.1,
@@ -90,26 +93,26 @@ test_that("decoded symbol has an entropy trace", {
 
 
 test_that("decoded symbol has a posterior trace", {
-    codebook <- construct_codebook(c('A', 'B', 'C'), c(1, 1, 1))
+    codebook <- construct_codebook(c('A', 'B', 'C'))
     
     signal <- encode_signal(
         codebook=codebook,
         symbol = 'A',
-        signal_power = 3,
-        timesteps = 10
+        signal_power = 10,
+        duration_in_seconds = 10
     )
     
     signal_plus_noise <- add_channel_noise(
         codebook = codebook,
         signal = signal,
         noise_power = 10,
-        timesteps=10
+        duration_in_seconds=10
     )
     
     decoded_signal <- decode_signal(
         codebook,
         signal_plus_noise = signal_plus_noise,
-        signal_power = 3,
+        signal_power = 10,
         noise_power = 10,
         time_interval = 0.1,
         entropy_threshold = 0.1,
