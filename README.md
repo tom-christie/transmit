@@ -16,7 +16,7 @@ devtools::install_github("tom-christie/transmit")
 
 ### Transmitting and decoding a signal
 ```r
-codebook <- construct_codebook(c('A', 'B', 'C'))
+codebook <- construct_codebook(c('A', 'B', 'C', 'D'))
 decoded_signal <- transmit_signal(
     codebook=codebook,
     symbol = 'A',
@@ -29,12 +29,12 @@ decoded_signal <- transmit_signal(
     #repeats=1:1000
 )
 > decoded_signal$stop_time_in_seconds    
-[1] 2.6    
+[1] 1.1
 > decoded_signal$decoded_symbol
 [1] "A"
 > decoded_signal$posterior_at_stop_time
 [[1]]
-[1] 0.995076435 0.001514943 0.003408622
+[1] 0.9899113279 0.0022606192 0.0001984631 0.0076295897
 ```
 
 ### Creating a plot of an entropy trace
