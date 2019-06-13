@@ -10,6 +10,7 @@ The aim of this package is to enable simulations of information transmission usi
 # Install the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("tom-christie/transmit")
+require(transmit)
 ```
 
 ## Example
@@ -26,7 +27,6 @@ decoded_signal <- transmit_signal(
     time_interval = 0.1,
     entropy_threshold = 0.1,
     return_posterior_at_stop_time = TRUE
-    #repeats=1:1000
 )
 > decoded_signal$stop_time_in_seconds    
 [1] 1.1

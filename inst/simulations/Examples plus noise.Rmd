@@ -1,0 +1,322 @@
+---
+title: "Examples plus noise"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+```{r  IMPORTANT - RT decrease from different distributions}
+# SAME THING WITH GAUSSIAN - still slope of -1
+  
+library(stats4)
+require(tidyverse)
+
+
+# https://stats.stackexchange.com/questions/7440/kl-divergence-between-two-univariate-gaussians
+#get KL divergence between actual P and estimate Q, i.e. KL(P||Q)
+kl_gaussian <- function(p.mu, p.sigma, q.mu, q.sigma){
+  return(
+    log2(q.sigma/p.sigma) + (p.sigma^2 + (p.mu-q.mu)^2)/(2*q.sigma^2) - 1/2
+  )  
+}
+
+p.mu = 30
+p.sigma = 21
+data_gaussian <- data_frame()
+#a bunch of repetitions just for fun
+for(user_number in 1:2000){
+  print(user_number)
+  for(n_samples in 2^seq(2,14,by=0.2)){
+    
+    #generate n_samples from actual distribution
+    x <- rnorm(floor(n_samples), mean = p.mu, sd = p.sigma)
+    LL <- function(mu, sigma) {
+      R = dnorm(x, mu, sigma)
+      return(-sum(log(R)))
+    }
+    #estimate parameters from distribution based on samples
+    z <- mle(LL, start = list(mu = mean(x), sigma=sd(x)), method = "L-BFGS", lower = c(-Inf, 0.1),
+             upper = c(Inf, Inf))
+    q.mu <- z@coef[1]
+    q.sigma <- z@coef[2]
+    
+    data_gaussian <- data_gaussian %>% 
+      bind_rows(data_frame(user_number = user_number, 
+                           KL=kl_gaussian(p.mu, p.sigma, q.mu, q.sigma), 
+                           samples = n_samples))
+  }
+}
+
+## Test
+data_gaussian %>%
+  group_by(samples) %>% #average across users
+  summarise(mean_kl = mean(KL,na.rm=T)) %>%
+  ungroup() %>%
+  ggplot() + 
+  geom_point(aes(samples,mean_kl)) + 
+  scale_x_log10() + 
+  scale_y_log10()
+
+write_csv(x=data_gaussian, path='kl_gaussian.csv')
+
+kl_multinomial <- function(q,p){
+  #p is actual probabilities
+  #q is probabilities or counts -   #NOTE THE ORDER
+  p <- p/sum(p)
+  q <- q/sum(q)
+  return(sum(p*log2(p/q)))
+}
+
+
+#binomial
+# add noise - for each flip, some pn = 0.02 probability that the opposite is observed
+# for the binomial
+
+## This changes the intercept but not the slope.
+pr <- runif(2)
+pr <- pr/sum(pr)
+data_binomial <- data_frame()
+for(user_number in 1:1000){
+  for(partial_update in c(0.01, 0.1, 0.2, 1)){
+      print(user_number)
+    for(n_samples in 2^seq(2,14,by=0.2)){
+    
+    #generate n_samples from actual distribution - less noise samples
+    x <- rmultinom(n_samples*partial_update, length(pr), prob=pr)
+    q <- colSums(t(x))
+    
+    #estimate parameters from distribution based on samples
+    #does noise mean taking samples OUT of the counts and redistributing them?
+    #100% noisy will be uniformly distributed (max entropy)
+    #Interesting, so noise will have less learning effect with already-even distributions????????????  yes, it shouldn't slow down learning but it'll screw up accuracy
+    #This disassociates response time and accuracy!!! (cool)
+    
+    #add noise samples to distribution
+    # q <- q + n_samples*noise/2
+    
+    #normalize to get proportions
+    q <- q/sum(q)
+    
+    data_binomial <- data_binomial %>% 
+      bind_rows(data_frame(user_number = user_number, 
+                           KL=kl_multinomial(q,pr), #REVERSE order
+                           samples = n_samples,
+                           partial_update=partial_update))
+  }
+  }
+
+}
+
+data_binomial %>%
+  group_by(samples, noise) %>%
+  summarise(ct = n())
+
+write_csv(x=data_binomial, path='kl_binomial_plus_noise.csv')
+
+## Test
+p <- data_binomial %>%
+  group_by(samples, partial_update) %>% #average across users
+  summarise(mean_kl = mean(KL,na.rm=T)) %>%
+  filter(mean_kl < 1) %>% 
+  ungroup() %>%
+  ggplot() + 
+  geom_point(aes(samples,mean_kl, color=as.factor(partial_update))) + 
+  scale_x_log10() + 
+  scale_y_log10() + 
+  scale_color_grey('Update fraction') +
+  labs(x='Number of observations',
+         y='KL') + 
+    theme(
+  legend.position = c(.05, .2))#
+
+save_plot('~/Dropbox/writing/examples paper/figures/partial_updates.png',
+          p,
+          base_aspect_ratio = 1.5)
+
+data_binomial %>%
+  group_by(samples) %>% #average across users
+  summarise(mean_kl = mean(KL,na.rm=T)) %>%
+  ungroup()
+
+
+```
+
+
+```{r}
+
+
+
+
+
+pr <- runif(16)
+data_multinomial <- data_frame()
+for(user_number in 1:2000){
+  print(user_number)
+  for(n_samples in 2^seq(2,14,by=0.2)){
+    #generate n_samples from actual distribution
+    x <- rmultinom(n_samples, length(pr), prob=pr)
+    
+    #estimate parameters from distribution based on samples
+    q <- colSums(t(x))
+    q <- q/sum(q)
+    
+    data_multinomial <- data_multinomial %>% 
+      bind_rows(data_frame(user_number = user_number, 
+                           KL=kl_multinomial(q,pr), #REVERSE order
+                           samples = n_samples))
+  }
+}
+
+write_csv(x=data_multinomial, path='kl_multinomial.csv')
+
+## Test
+data_multinomial %>%
+  group_by(samples) %>% #average across users
+  summarise(mean_kl = mean(KL,na.rm=T)) %>%
+  ungroup() %>%
+  ggplot() + 
+  geom_point(aes(samples,mean_kl)) + 
+  scale_x_log10() + 
+  scale_y_log10()
+
+
+
+
+#combine data
+d <- data_binomial %>% 
+  mutate(distribution='Binomial') %>%
+  bind_rows(data_multinomial %>% 
+              mutate(distribution = 'Multinomial')) %>%
+  bind_rows(data_gaussian %>% 
+              mutate(distribution = 'Gaussian')) %>%
+  filter(!is.na(KL),
+     is.finite(KL)) %>%
+  filter(samples <= 10000) %>%
+  group_by(samples, distribution) %>% #average across users
+  summarise(mean_kl = mean(KL,na.rm=T)) %>%
+  ungroup()
+
+  
+
+# make and save plot
+p <- d %>%
+  mutate(distribution = fct_relevel(distribution, "Gaussian", "Binomial","Multinomial")) %>%
+  ggplot() + 
+  geom_point(aes(samples, mean_kl, color=distribution)) + 
+  scale_x_log10(breaks=c( 1, 10, 100, 1000,10000)) + 
+  scale_y_log10(breaks=c(.001, 0.01, 0.1, 1, 10)) + 
+  scale_color_grey('Distribution') +
+  labs(title="Response time improvement by stimulus distribution",
+         x='Number of observations',
+         y='KL(P || Q) =\nexpected added code length') + 
+    theme(
+  legend.position = c(.95, .95),
+  legend.justification = c("right", "top"))
+
+save_plot('~/Dropbox/writing/examples paper/figures/power_law_of_learing_distributions.png',
+          p,
+          base_aspect_ratio = 1.5)
+  
+
+## Now get the data from the binomial one and figure out the error rate based on how much is transmitted in an alotted time
+
+pr <- c(.1,.9)
+data_binomial_errors <- data_frame()
+for(user_number in 1:1000){
+  print(user_number)
+  for(n_samples in 1:200){
+    
+    #generate n_samples from actual distribution
+    x <- rmultinom(n_samples, length(pr), prob=pr)
+    
+    #estimate parameters from distribution based on samples
+    q <- colSums(t(x))
+    q <- q/sum(q)
+    
+    data_binomial_errors <- data_binomial_errors %>% 
+      bind_rows(data_frame(user_number = user_number, 
+                           KL=kl_multinomial(q,pr), #REVERSE order
+                           samples = n_samples))
+  }
+}
+
+info_to_send <- -sum(pr*log2(pr))
+
+
+data_binomial_errors_info_sent  <- data_frame() %>%
+  bind_rows(data_binomial_errors %>%
+            mutate(time = 0.5,
+                   info_sent = pmin(1,time/(info_to_send+KL)))) %>%
+  bind_rows(data_binomial_errors %>%
+            mutate(time = 0.75,
+                   info_sent = pmin(1,time/(info_to_send+KL)))) %>%
+  bind_rows(data_binomial_errors %>%
+            mutate(time = 0.25,
+                   info_sent = pmin(1,time/(info_to_send+KL)))) %>%
+  bind_rows(data_binomial_errors %>%
+            mutate(time = 1.0,
+                   info_sent = pmin(1,time/(info_to_send+KL))))
+
+## Make a fixed forced-choice timeout
+## Calculate the probability of answering correcty within that time
+## Implies you'd answer perfectly if you had forever - this only accounts for signal transmission error!
+## But still it'll be revealing...
+# What is the probability of correct? 
+#H(x) = -p*log(p) - (1-p)*log(1-p)
+# Want to solve for H(X) where p > 0.5
+
+f <- function (p,H) (H - (-p*log2(p) - (1-p)*log2(1-p)))^2
+
+H_to_p <- function(.H){
+  xmin <- optimize(f, # function to optimize over
+                   c(0.5, 1), #interval to search over
+                   tol = 0.0001, 
+                   H = .H #value of second argument
+                   )
+  return(xmin$minimum)
+}
+
+#H = seq(0,1,by=0.01)
+#plot(1-H, mapply(H_to_p,.H=H))  #1-H is information sent???  H is uncertainty left...
+
+data_binomial_errors_prob_correct <- data_binomial_errors_info_sent %>%
+  drop_na(KL) %>%
+  filter(is.finite(KL)) %>%
+  mutate(entropy_remaining = 1-info_sent,
+         prob_correct = unlist(purrr::map(entropy_remaining, H_to_p)))
+
+
+#data %>% filter(observation < 10) %>% View
+#hist(data$prob_correct)
+
+p <- data_binomial_errors_prob_correct %>%
+  group_by(samples, time) %>% #group across users
+  summarise(prob_correct = mean(prob_correct, na.rm=T)) %>%
+  ungroup() %>% 
+  filter(samples < 50) %>%
+  ggplot()+ 
+  geom_point(aes(samples, 1-prob_correct, color=as.factor(time))) + 
+  geom_line(aes(samples, 1-prob_correct, color=as.factor(time))) + 
+  scale_color_grey('Forced-choice time (s)') +
+  labs(title="Improved accuracy with practice on a forced-choice task",
+         x='Number of observations',
+         y='Error rate') + 
+    theme(
+  legend.position = c(.95, .95),
+  legend.justification = c("right", "top"))
+
+  save_plot('~/Dropbox/writing/examples paper/figures/error_rate_decrease.png',
+          p,
+          base_aspect_ratio = 1.5)
+  
+  
+  
+  
+
+```
+
