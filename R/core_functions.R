@@ -31,8 +31,8 @@ encode_signal <- function(codebook,
                           leak_symbols = NA,
                           leak_powers = NA) {
     
-    assert_that(!(symbol %in% leak_symbols), 
-                msg='Do not include your transmitted signal in the list of leak signals')
+    #assert_that(!(symbol %in% leak_symbols), 
+    #            msg='Do not include your transmitted signal in the list of leak signals')
     assert_that(symbol %in% lapply(codebook,function(x){x$symbol}),
                 msg='Symbol to be transmitted is not in the codebook provided.')
     assert_that(length(leak_symbols) == length(leak_powers),
